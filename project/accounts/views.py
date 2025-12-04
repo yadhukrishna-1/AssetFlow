@@ -10,6 +10,7 @@ from assignments.models import Assignment
 from categories.models import Category
 from assets.forms import AssetForm
 from assignments.forms import AssignmentForm
+from .forms import CustomUserCreationForm
 from django.db.models import Q, Count
 
 def custom_login(request):
@@ -50,12 +51,20 @@ def admin_dashboard(request):
     total_users = User.objects.count()
     active_assignments = Assignment.objects.filter(active=True).count()
     
+    # User statistics by role
+    admin_count = User.objects.filter(role='admin').count()
+    manager_count = User.objects.filter(role='asset_manager').count()
+    employee_count = User.objects.filter(role='employee').count()
+    
     context = {
         'total_assets': total_assets,
         'available_assets': available_assets,
         'assigned_assets': assigned_assets,
         'total_users': total_users,
         'active_assignments': active_assignments,
+        'admin_count': admin_count,
+        'manager_count': manager_count,
+        'employee_count': employee_count,
     }
     return render(request, 'admin_dashboard.html', context)
 
@@ -123,6 +132,125 @@ def manage_users(request):
         'page_obj': page_obj,
         'search_query': search_query
     })
+
+@login_required(login_url='login')
+def create_user(request):
+    """Admin view to create new user"""
+    if not request.user.is_admin():
+        messages.error(request, 'Access denied.')
+        return redirect('home')
+    
+    if request.method == 'POST':
+        form = CustomUserCreationForm(request.POST)
+        if form.is_valid():
+            user = form.save()
+            messages.success(request, f'User {user.username} created successfully!')
+            return redirect('manage_users')
+    else:
+        form = CustomUserCreationForm()
+    
+    return render(request, 'admin/create_user.html', {'form': form})
+
+@login_required(login_url='login')
+def bulk_create_users(request):
+    """Admin view to create multiple users at once"""
+    if not request.user.is_admin():
+        messages.error(request, 'Access denied.')
+        return redirect('home')
+    
+    if request.method == 'POST':
+        users_data = request.POST.get('users_data', '').strip()
+        if not users_data:
+            messages.error(request, 'Please provide user data.')
+            return render(request, 'admin/bulk_create_users.html')
+        
+        created_users = []
+        errors = []
+        
+        for line_num, line in enumerate(users_data.split('\n'), 1):
+            line = line.strip()
+            if not line:
+                continue
+                
+            try:
+                parts = [part.strip() for part in line.split(',')]
+                if len(parts) < 5:
+                    errors.append(f'Line {line_num}: Invalid format. Expected: username,email,first_name,last_name,role')
+                    continue
+                
+                username, email, first_name, last_name, role = parts[:5]
+                
+                # Validate role
+                valid_roles = [choice[0] for choice in User.ROLE_CHOICES]
+                if role not in valid_roles:
+                    errors.append(f'Line {line_num}: Invalid role "{role}". Valid roles: {valid_roles}')
+                    continue
+                
+                # Check admin restriction
+                if role == 'admin' and User.objects.filter(role='admin').exists():
+                    errors.append(f'Line {line_num}: Cannot create admin user. Only one admin is allowed.')
+                    continue
+                
+                # Check if username already exists
+                if User.objects.filter(username=username).exists():
+                    errors.append(f'Line {line_num}: Username "{username}" already exists.')
+                    continue
+                
+                # Create user
+                user = User.objects.create_user(
+                    username=username,
+                    email=email,
+                    first_name=first_name,
+                    last_name=last_name,
+                    password='password123',  # Default password
+                    role=role
+                )
+                created_users.append(user)
+                
+            except Exception as e:
+                errors.append(f'Line {line_num}: Error creating user - {str(e)}')
+        
+        if created_users:
+            messages.success(request, f'Successfully created {len(created_users)} users.')
+        if errors:
+            for error in errors:
+                messages.error(request, error)
+        
+        if created_users and not errors:
+            return redirect('manage_users')
+    
+    return render(request, 'admin/bulk_create_users.html')
+
+@login_required(login_url='login')
+def edit_user(request, user_id):
+    """Admin view to edit user"""
+    if not request.user.is_admin():
+        messages.error(request, 'Access denied.')
+        return redirect('home')
+    
+    user = get_object_or_404(User, id=user_id)
+    
+    if request.method == 'POST':
+        # Simple form handling for user editing
+        user.first_name = request.POST.get('first_name', '')
+        user.last_name = request.POST.get('last_name', '')
+        user.email = request.POST.get('email', '')
+        new_role = request.POST.get('role')
+        
+        # Prevent changing to admin if one already exists
+        if new_role == 'admin' and user.role != 'admin':
+            if User.objects.filter(role='admin').exists():
+                messages.error(request, 'Only one admin user is allowed.')
+                return render(request, 'admin/edit_user.html', {'user_obj': user})
+        
+        user.role = new_role
+        user.is_active = request.POST.get('is_active') == 'on'
+        user.save()
+        
+        messages.success(request, 'User updated successfully!')
+        return redirect('manage_users')
+    
+    return render(request, 'admin/edit_user.html', {'user_obj': user})
 
 @login_required(login_url='login')
 def manage_assets(request):
@@ -409,3 +537,25 @@ def asset_manager_create_assignment(request):
         form = AssignmentForm()
     
     return render(request, 'asset_manager/create_assignment.html', {'form': form})
+
+@login_required(login_url='login')
+def delete_user(request, user_id):
+    """Admin view to delete user"""
+    if not request.user.is_admin():
+        messages.error(request, 'Access denied.')
+        return redirect('home')
+    
+    user = get_object_or_404(User, id=user_id)
+    
+    # Prevent deleting admin user
+    if user.role == 'admin':
+        messages.error(request, 'Cannot delete admin user.')
+        return redirect('manage_users')
+    
+    if request.method == 'POST':
+        username = user.username
+        user.delete()
+        messages.success(request, f'User {username} deleted successfully!')
+        return redirect('manage_users')
+    
+    return render(request, 'admin/delete_user.html', {'user_obj': user})

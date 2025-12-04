@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create User - AssetFlow</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', sans-serif; background: #f8f9fa; }
+        .navbar { background: linear-gradient(135deg, #ff7e5f 0%, #feb47b 100%); padding: 20px 40px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .navbar h1 { color: white; font-size: 24px; }
+        .navbar a { color: white; text-decoration: none; padding: 10px 20px; background: rgba(255,255,255,0.2); border-radius: 5px; transition: all 0.3s; margin-left: 10px; }
+        .navbar a:hover { background: rgba(255,255,255,0.3); }
+        .container { max-width: 800px; margin: 40px auto; padding: 0 20px; }
+        .form-container { background: white; padding: 40px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .form-group { margin-bottom: 20px; }
+        .form-group label { display: block; margin-bottom: 8px; font-weight: 600; color: #333; }
+        .form-group input, .form-group select { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 5px; font-size: 14px; }
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .btn { padding: 12px 24px; background: #ff7e5f; color: white; border: none; border-radius: 5px; cursor: pointer; text-decoration: none; display: inline-block; margin-right: 10px; }
+        .btn:hover { background: #e66a4f; }
+        .btn-secondary { background: #6c757d; }
+        .btn-secondary:hover { background: #5a6268; }
+        .error { color: #dc3545; font-size: 12px; margin-top: 5px; }
+        .required { color: #dc3545; }
+    </style>
+</head>
+<body>
+    <div class="navbar">
+        <h1>AssetFlow - Create User</h1>
+        <div>
+            <a href="{% url 'manage_users' %}">Back to Users</a>
+            <a href="{% url 'admin_dashboard' %}">Dashboard</a>
+            <a href="{% url 'logout' %}">Logout</a>
+        </div>
+    </div>
+    
+    <div class="container">
+        <div class="form-container">
+            <h2 style="margin-bottom: 30px; color: #333;">Create New User</h2>
+            
+            <form method="POST">
+                {% csrf_token %}
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="{{ form.username.id_for_label }}">Username <span class="required">*</span></label>
+                        {{ form.username }}
+                        {% if form.username.errors %}
+                            <div class="error">{{ form.username.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="{{ form.email.id_for_label }}">Email <span class="required">*</span></label>
+                        {{ form.email }}
+                        {% if form.email.errors %}
+                            <div class="error">{{ form.email.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="{{ form.first_name.id_for_label }}">First Name <span class="required">*</span></label>
+                        {{ form.first_name }}
+                        {% if form.first_name.errors %}
+                            <div class="error">{{ form.first_name.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="{{ form.last_name.id_for_label }}">Last Name <span class="required">*</span></label>
+                        {{ form.last_name }}
+                        {% if form.last_name.errors %}
+                            <div class="error">{{ form.last_name.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="{{ form.role.id_for_label }}">Role <span class="required">*</span></label>
+                    {{ form.role }}
+                    {% if form.role.errors %}
+                        <div class="error">{{ form.role.errors.0 }}</div>
+                    {% endif %}
+                    <div style="font-size: 12px; color: #666; margin-top: 5px; background: #f8f9fa; padding: 10px; border-radius: 5px;">
+                        <strong>Role Information:</strong><br>
+                        • <strong>Admin:</strong> Full system access (only one allowed)<br>
+                        • <strong>Asset Manager:</strong> Can manage assets and assignments<br>
+                        • <strong>Employee:</strong> Can view assigned assets only
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="{{ form.password1.id_for_label }}">Password <span class="required">*</span></label>
+                        {{ form.password1 }}
+                        {% if form.password1.errors %}
+                            <div class="error">{{ form.password1.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="{{ form.password2.id_for_label }}">Confirm Password <span class="required">*</span></label>
+                        {{ form.password2 }}
+                        {% if form.password2.errors %}
+                            <div class="error">{{ form.password2.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <div style="margin-top: 30px;">
+                    <button type="submit" class="btn">Create User</button>
+                    <a href="{% url 'manage_users' %}" class="btn btn-secondary">Cancel</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</body>
+</html>

@@ -55,14 +55,18 @@ urlpatterns = [
     path('employee-dashboard/', accounts_views.employee_dashboard, name='employee_dashboard'),
     
     # Admin management URLs
-    path('admin/users/', accounts_views.manage_users, name='manage_users'),
-    path('admin/assets/', accounts_views.manage_assets, name='manage_assets'),
-    path('admin/assets/add/', accounts_views.add_asset, name='add_asset'),
-    path('admin/assets/<int:asset_id>/edit/', accounts_views.edit_asset, name='edit_asset'),
-    path('admin/assets/<int:asset_id>/delete/', accounts_views.delete_asset, name='delete_asset'),
-    path('admin/assignments/', accounts_views.manage_assignments, name='manage_assignments'),
-    path('admin/assignments/create/', accounts_views.create_assignment, name='create_assignment'),
-    path('admin/assignments/<int:assignment_id>/return/', accounts_views.return_asset, name='return_asset'),
+    path('admin-panel/users/', accounts_views.manage_users, name='manage_users'),
+    path('admin-panel/users/create/', accounts_views.create_user, name='create_user'),
+    path('admin-panel/users/bulk-create/', accounts_views.bulk_create_users, name='bulk_create_users'),
+    path('admin-panel/users/<int:user_id>/edit/', accounts_views.edit_user, name='edit_user'),
+    path('admin-panel/users/<int:user_id>/delete/', accounts_views.delete_user, name='delete_user'),
+    path('admin-panel/assets/', accounts_views.manage_assets, name='manage_assets'),
+    path('admin-panel/assets/add/', accounts_views.add_asset, name='add_asset'),
+    path('admin-panel/assets/<int:asset_id>/edit/', accounts_views.edit_asset, name='edit_asset'),
+    path('admin-panel/assets/<int:asset_id>/delete/', accounts_views.delete_asset, name='delete_asset'),
+    path('admin-panel/assignments/', accounts_views.manage_assignments, name='manage_assignments'),
+    path('admin-panel/assignments/create/', accounts_views.create_assignment, name='create_assignment'),
+    path('admin-panel/assignments/<int:assignment_id>/return/', accounts_views.return_asset, name='return_asset'),
     
     # Asset Manager URLs
     path('asset-manager/assets/', accounts_views.asset_manager_assets, name='asset_manager_assets'),

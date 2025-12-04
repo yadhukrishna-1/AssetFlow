@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit User - AssetFlow</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', sans-serif; background: #f8f9fa; }
+        .navbar { background: linear-gradient(135deg, #ff7e5f 0%, #feb47b 100%); padding: 20px 40px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .navbar h1 { color: white; font-size: 24px; }
+        .navbar a { color: white; text-decoration: none; padding: 10px 20px; background: rgba(255,255,255,0.2); border-radius: 5px; transition: all 0.3s; margin-left: 10px; }
+        .navbar a:hover { background: rgba(255,255,255,0.3); }
+        .container { max-width: 800px; margin: 40px auto; padding: 0 20px; }
+        .form-container { background: white; padding: 40px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .form-group { margin-bottom: 20px; }
+        .form-group label { display: block; margin-bottom: 8px; font-weight: 600; color: #333; }
+        .form-group input, .form-group select { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 5px; font-size: 14px; }
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .btn { padding: 12px 24px; background: #ff7e5f; color: white; border: none; border-radius: 5px; cursor: pointer; text-decoration: none; display: inline-block; margin-right: 10px; }
+        .btn:hover { background: #e66a4f; }
+        .btn-secondary { background: #6c757d; }
+        .btn-secondary:hover { background: #5a6268; }
+        .checkbox-group { display: flex; align-items: center; gap: 10px; }
+        .checkbox-group input[type="checkbox"] { width: auto; }
+    </style>
+</head>
+<body>
+    <div class="navbar">
+        <h1>AssetFlow - Edit User</h1>
+        <div>
+            <a href="{% url 'manage_users' %}">Back to Users</a>
+            <a href="{% url 'admin_dashboard' %}">Dashboard</a>
+            <a href="{% url 'logout' %}">Logout</a>
+        </div>
+    </div>
+    
+    <div class="container">
+        <div class="form-container">
+            <h2 style="margin-bottom: 30px; color: #333;">Edit User: {{ user_obj.username }}</h2>
+            
+            <form method="POST">
+                {% csrf_token %}
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Username</label>
+                        <input type="text" value="{{ user_obj.username }}" disabled style="background: #f8f9fa;">
+                        <p style="font-size: 12px; color: #666; margin-top: 5px;">Username cannot be changed</p>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="email">Email</label>
+                        <input type="email" name="email" value="{{ user_obj.email }}" required>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="first_name">First Name</label>
+                        <input type="text" name="first_name" value="{{ user_obj.first_name }}" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="last_name">Last Name</label>
+                        <input type="text" name="last_name" value="{{ user_obj.last_name }}" required>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="role">Role</label>
+                    <select name="role" required>
+                        <option value="admin" {% if user_obj.role == 'admin' %}selected{% endif %}>Admin</option>
+                        <option value="asset_manager" {% if user_obj.role == 'asset_manager' %}selected{% endif %}>Asset Manager</option>
+                        <option value="employee" {% if user_obj.role == 'employee' %}selected{% endif %}>Employee</option>
+                    </select>
+                    {% if user_obj.role != 'admin' %}
+                        <p style="font-size: 12px; color: #666; margin-top: 5px;">Note: Only one admin user is allowed in the system</p>
+                    {% endif %}
+                </div>
+                
+                <div class="form-group">
+                    <div class="checkbox-group">
+                        <input type="checkbox" name="is_active" {% if user_obj.is_active %}checked{% endif %}>
+                        <label for="is_active">Active User</label>
+                    </div>
+                    <p style="font-size: 12px; color: #666; margin-top: 5px;">Inactive users cannot log in</p>
+                </div>
+                
+                <div style="margin-top: 30px;">
+                    <button type="submit" class="btn">Update User</button>
+                    <a href="{% url 'manage_users' %}" class="btn btn-secondary">Cancel</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</body>
+</html>

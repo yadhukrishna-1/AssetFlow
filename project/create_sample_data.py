@@ -38,16 +38,23 @@ def create_sample_data():
         if created:
             print(f"Created category: {category.name}")
     
-    # Create users
+    # Create users with admin restriction
     users_data = [
         {'username': 'admin', 'email': 'admin@company.com', 'first_name': 'System', 'last_name': 'Administrator', 'role': 'admin'},
         {'username': 'asset_manager', 'email': 'manager@company.com', 'first_name': 'Asset', 'last_name': 'Manager', 'role': 'asset_manager'},
+        {'username': 'manager2', 'email': 'manager2@company.com', 'first_name': 'Sarah', 'last_name': 'Johnson', 'role': 'asset_manager'},
         {'username': 'john_doe', 'email': 'john@company.com', 'first_name': 'John', 'last_name': 'Doe', 'role': 'employee'},
         {'username': 'jane_smith', 'email': 'jane@company.com', 'first_name': 'Jane', 'last_name': 'Smith', 'role': 'employee'},
         {'username': 'bob_wilson', 'email': 'bob@company.com', 'first_name': 'Bob', 'last_name': 'Wilson', 'role': 'employee'},
+        {'username': 'alice_brown', 'email': 'alice@company.com', 'first_name': 'Alice', 'last_name': 'Brown', 'role': 'employee'},
     ]
     
     for user_data in users_data:
+        # Skip admin creation if one already exists
+        if user_data['role'] == 'admin' and User.objects.filter(role='admin').exists():
+            print(f"Admin user already exists, skipping {user_data['username']}")
+            continue
+            
         user, created = User.objects.get_or_create(
             username=user_data['username'],
             defaults={
@@ -61,6 +68,8 @@ def create_sample_data():
             user.set_password('password123')  # Default password for all users
             user.save()
             print(f"Created user: {user.username} ({user.get_role_display()})")
+        else:
+            print(f"User already exists: {user.username}")
     
     # Create assets
     laptop_category = Category.objects.get(name='Laptops')
@@ -143,11 +152,13 @@ def create_sample_data():
         print(f"Created assignment: {iphone.name} -> {john.get_full_name()}")
     
     print("\nSample data creation completed!")
-    print("\nLogin credentials:")
-    print("Admin: username='admin', password='password123'")
-    print("Asset Manager: username='asset_manager', password='password123'")
-    print("Employee: username='john_doe', password='password123'")
-    print("Employee: username='jane_smith', password='password123'")
+    print("\nLogin credentials (password: 'password123' for all):")
+    print("Admin: username='admin'")
+    print("Asset Managers: username='asset_manager', 'manager2'")
+    print("Employees: username='john_doe', 'jane_smith', 'bob_wilson', 'alice_brown'")
+    print("\nNote: You can create additional users through the admin panel or use:")
+    print("python manage.py createusers --batch  # Create sample users")
+    print("python manage.py createusers  # Create single user interactively")
 
 if __name__ == '__main__':
     create_sample_data()

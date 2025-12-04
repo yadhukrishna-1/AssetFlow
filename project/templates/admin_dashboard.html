@@ -64,6 +64,26 @@
             </div>
         </div>
         
+        <!-- User Role Statistics -->
+        <div class="stats-grid" style="margin-bottom: 40px;">
+            <div class="stat-card" style="background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);">
+                <h3>{{ admin_count }}</h3>
+                <p>Admin Users</p>
+            </div>
+            <div class="stat-card" style="background: linear-gradient(135deg, #fd7e14 0%, #e55a00 100%);">
+                <h3>{{ manager_count }}</h3>
+                <p>Asset Managers</p>
+            </div>
+            <div class="stat-card" style="background: linear-gradient(135deg, #28a745 0%, #1e7e34 100%);">
+                <h3>{{ employee_count }}</h3>
+                <p>Employees</p>
+            </div>
+            <div class="stat-card" style="background: linear-gradient(135deg, #6f42c1 0%, #5a2d91 100%);">
+                <h3>{{ active_assignments }}</h3>
+                <p>Active Assignments</p>
+            </div>
+        </div>
+        
         <div class="dashboard-grid">
             <a href="{% url 'manage_users' %}" class="card-link">
                 <div class="card">
