@@ -24,6 +24,7 @@ from rest_framework import routers
 from assets.views import AssetViewSet
 from assignments.views import AssignmentViewSet
 from accounts import views as accounts_views
+from reports import views as reports_views
 
 router = routers.DefaultRouter()
 router.register(r'assets', AssetViewSet, basename='asset')
@@ -52,6 +53,31 @@ urlpatterns = [
     path('admin-dashboard/', accounts_views.admin_dashboard, name='admin_dashboard'),
     path('asset-manager-dashboard/', accounts_views.asset_manager_dashboard, name='asset_manager_dashboard'),
     path('employee-dashboard/', accounts_views.employee_dashboard, name='employee_dashboard'),
+    
+    # Admin management URLs
+    path('admin/users/', accounts_views.manage_users, name='manage_users'),
+    path('admin/assets/', accounts_views.manage_assets, name='manage_assets'),
+    path('admin/assets/add/', accounts_views.add_asset, name='add_asset'),
+    path('admin/assets/<int:asset_id>/edit/', accounts_views.edit_asset, name='edit_asset'),
+    path('admin/assets/<int:asset_id>/delete/', accounts_views.delete_asset, name='delete_asset'),
+    path('admin/assignments/', accounts_views.manage_assignments, name='manage_assignments'),
+    path('admin/assignments/create/', accounts_views.create_assignment, name='create_assignment'),
+    path('admin/assignments/<int:assignment_id>/return/', accounts_views.return_asset, name='return_asset'),
+    
+    # Asset Manager URLs
+    path('asset-manager/assets/', accounts_views.asset_manager_assets, name='asset_manager_assets'),
+    path('asset-manager/assignments/', accounts_views.asset_manager_assignments, name='asset_manager_assignments'),
+    path('asset-manager/users/', accounts_views.asset_manager_users, name='asset_manager_users'),
+    path('asset-manager/users/<int:user_id>/toggle/', accounts_views.toggle_user_status, name='toggle_user_status'),
+    path('asset-manager/assets/add/', accounts_views.asset_manager_add_asset, name='asset_manager_add_asset'),
+    path('asset-manager/assets/<int:asset_id>/edit/', accounts_views.asset_manager_edit_asset, name='asset_manager_edit_asset'),
+    path('asset-manager/assignments/create/', accounts_views.asset_manager_create_assignment, name='asset_manager_create_assignment'),
+    
+    # Reports URLs
+    path('reports/assets/', reports_views.asset_report, name='asset_report'),
+    path('reports/assignments/', reports_views.assignment_report, name='assignment_report'),
+    path('reports/export/assets/', reports_views.export_assets_csv, name='export_assets_csv'),
+    path('reports/export/assignments/', reports_views.export_assignments_csv, name='export_assignments_csv'),
 ]
 
 if settings.DEBUG:

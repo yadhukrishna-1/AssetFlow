@@ -15,7 +15,12 @@
         .welcome { background: white; padding: 30px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); margin-bottom: 40px; }
         .welcome h2 { color: #ff4500; margin-bottom: 10px; }
         .welcome p { color: #7f8c8d; }
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 40px; }
+        .stat-card { background: linear-gradient(135deg, #ff7e5f 0%, #feb47b 100%); color: white; padding: 30px; border-radius: 10px; text-align: center; }
+        .stat-card h3 { font-size: 36px; margin-bottom: 10px; }
+        .stat-card p { font-size: 16px; opacity: 0.9; }
         .dashboard-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; }
+        .card-link { text-decoration: none; color: inherit; }
         .card { background: white; padding: 30px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); border: 2px solid #ff7e5f; text-align: center; transition: transform 0.3s; }
         .card:hover { transform: translateY(-5px); box-shadow: 0 5px 20px rgba(0,0,0,0.15); }
         .card h3 { color: #ff4500; margin-bottom: 10px; font-size: 20px; }
@@ -39,19 +44,51 @@
             <h2>Welcome, {{ user.get_full_name|default:user.username }}!</h2>
             <p>You are logged in as an <strong>Asset Manager</strong>.</p>
         </div>
+        <!-- Statistics Cards -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <h3>{{ total_assets }}</h3>
+                <p>Total Assets</p>
+            </div>
+            <div class="stat-card">
+                <h3>{{ available_assets }}</h3>
+                <p>Available Assets</p>
+            </div>
+            <div class="stat-card">
+                <h3>{{ assigned_assets }}</h3>
+                <p>Assigned Assets</p>
+            </div>
+            <div class="stat-card">
+                <h3>{{ repair_assets }}</h3>
+                <p>Under Repair</p>
+            </div>
+        </div>
+        
         <div class="dashboard-grid">
-            <div class="card">
-                <h3>📦 Manage Assets</h3>
-                <p>Track and manage all company assets</p>
-            </div>
-            <div class="card">
-                <h3>👤 Asset Assignments</h3>
-                <p>Assign assets to employees and manage allocations</p>
-            </div>
-            <div class="card">
-                <h3>📊 Asset Reports</h3>
-                <p>Generate reports on asset usage and status</p>
-            </div>
+            <a href="{% url 'asset_manager_assets' %}" class="card-link">
+                <div class="card">
+                    <h3>📦 Manage Assets</h3>
+                    <p>Track and manage all company assets</p>
+                </div>
+            </a>
+            <a href="{% url 'asset_manager_assignments' %}" class="card-link">
+                <div class="card">
+                    <h3>👤 Asset Assignments</h3>
+                    <p>Assign assets to employees and manage allocations</p>
+                </div>
+            </a>
+            <a href="{% url 'asset_manager_users' %}" class="card-link">
+                <div class="card">
+                    <h3>👥 Manage Employees</h3>
+                    <p>Manage employee accounts and status</p>
+                </div>
+            </a>
+            <a href="{% url 'asset_manager_add_asset' %}" class="card-link">
+                <div class="card">
+                    <h3>➕ Add New Asset</h3>
+                    <p>Add new assets to the system</p>
+                </div>
+            </a>
         </div>
     </div>
 </body>

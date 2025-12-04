@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Assets - AssetFlow</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', sans-serif; background: #f8f9fa; }
+        .navbar { background: linear-gradient(135deg, #ff7e5f 0%, #feb47b 100%); padding: 20px 40px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .navbar h1 { color: white; font-size: 24px; }
+        .navbar a { color: white; text-decoration: none; padding: 10px 20px; background: rgba(255,255,255,0.2); border-radius: 5px; transition: all 0.3s; margin-left: 10px; }
+        .navbar a:hover { background: rgba(255,255,255,0.3); }
+        .container { max-width: 1400px; margin: 40px auto; padding: 0 20px; }
+        .header { background: white; padding: 30px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); margin-bottom: 30px; display: flex; justify-content: space-between; align-items: center; }
+        .filters { display: flex; gap: 15px; margin-bottom: 20px; }
+        .filters input, .filters select { padding: 12px; border: 1px solid #ddd; border-radius: 5px; }
+        .btn { padding: 12px 24px; background: #ff7e5f; color: white; border: none; border-radius: 5px; cursor: pointer; text-decoration: none; display: inline-block; }
+        .btn:hover { background: #e66a4f; }
+        .btn-success { background: #28a745; }
+        .btn-success:hover { background: #218838; }
+        .btn-secondary { background: #6c757d; }
+        .btn-secondary:hover { background: #5a6268; }
+        .table-container { background: white; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); overflow: hidden; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { padding: 15px; text-align: left; border-bottom: 1px solid #eee; }
+        th { background: #f8f9fa; font-weight: 600; }
+        .status-badge { padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 500; }
+        .status-available { background: #28a745; color: white; }
+        .status-assigned { background: #fd7e14; color: white; }
+        .status-under_repair { background: #dc3545; color: white; }
+        .asset-image { width: 50px; height: 50px; object-fit: cover; border-radius: 5px; }
+        .pagination { display: flex; justify-content: center; margin-top: 20px; gap: 10px; }
+        .pagination a, .pagination span { padding: 8px 12px; border: 1px solid #ddd; border-radius: 5px; text-decoration: none; }
+        .pagination .current { background: #ff7e5f; color: white; border-color: #ff7e5f; }
+    </style>
+</head>
+<body>
+    <div class="navbar">
+        <h1>AssetFlow - Manage Assets</h1>
+        <div>
+            <a href="{% url 'asset_manager_dashboard' %}">Dashboard</a>
+            <a href="{% url 'logout' %}">Logout</a>
+        </div>
+    </div>
+    
+    <div class="container">
+        <div class="header">
+            <div>
+                <h2>Asset Management</h2>
+                <p>Manage all company assets</p>
+            </div>
+            <a href="{% url 'asset_manager_add_asset' %}" class="btn btn-success">Add New Asset</a>
+        </div>
+        
+        <div class="filters">
+            <form method="GET" style="display: flex; gap: 15px; width: 100%;">
+                <input type="text" name="search" placeholder="Search assets..." value="{{ search_query }}" style="flex: 1;">
+                <select name="status">
+                    <option value="">All Status</option>
+                    {% for value, label in status_choices %}
+                        <option value="{{ value }}" {% if status_filter == value %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                </select>
+                <button type="submit" class="btn">Filter</button>
+                <a href="{% url 'asset_manager_assets' %}" class="btn btn-secondary">Clear</a>
+            </form>
+        </div>
+        
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Image</th>
+                        <th>Name</th>
+                        <th>Serial Number</th>
+                        <th>Category</th>
+                        <th>Brand</th>
+                        <th>Status</th>
+                        <th>Purchase Date</th>
+                        <th>Cost</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for asset in page_obj %}
+                    <tr>
+                        <td>
+                            {% if asset.image %}
+                                <img src="{{ asset.image.url }}" alt="{{ asset.name }}" class="asset-image">
+                            {% else %}
+                                <div style="width: 50px; height: 50px; background: #f0f0f0; border-radius: 5px; display: flex; align-items: center; justify-content: center; font-size: 12px; color: #666;">No Image</div>
+                            {% endif %}
+                        </td>
+                        <td><strong>{{ asset.name }}</strong></td>
+                        <td>{{ asset.serial_number }}</td>
+                        <td>{{ asset.category.name }}</td>
+                        <td>{{ asset.brand|default:"-" }}</td>
+                        <td>
+                            <span class="status-badge status-{{ asset.status }}">
+                                {{ asset.get_status_display }}
+                            </span>
+                        </td>
+                        <td>{{ asset.purchase_date|date:"M d, Y"|default:"-" }}</td>
+                        <td>
+                            {% if asset.cost %}
+                                ${{ asset.cost|floatformat:2 }}
+                            {% else %}
+                                -
+                            {% endif %}
+                        </td>
+                        <td>
+                            <a href="{% url 'asset_manager_edit_asset' asset.id %}" class="btn" style="font-size: 12px; padding: 6px 12px;">Edit</a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="9" style="text-align: center; color: #666;">No assets found</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        
+        {% if page_obj.has_other_pages %}
+        <div class="pagination">
+            {% if page_obj.has_previous %}
+                <a href="?page=1{% if search_query %}&search={{ search_query }}{% endif %}{% if status_filter %}&status={{ status_filter }}{% endif %}">&laquo; First</a>
+                <a href="?page={{ page_obj.previous_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}{% if status_filter %}&status={{ status_filter }}{% endif %}">Previous</a>
+            {% endif %}
+            
+            <span class="current">
+                Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+            </span>
+            
+            {% if page_obj.has_next %}
+                <a href="?page={{ page_obj.next_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}{% if status_filter %}&status={{ status_filter }}{% endif %}">Next</a>
+                <a href="?page={{ page_obj.paginator.num_pages }}{% if search_query %}&search={{ search_query }}{% endif %}{% if status_filter %}&status={{ status_filter }}{% endif %}">Last &raquo;</a>
+            {% endif %}
+        </div>
+        {% endif %}
+    </div>
+</body>
+</html>

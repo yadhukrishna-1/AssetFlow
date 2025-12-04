@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Assignment - AssetFlow</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', sans-serif; background: #f8f9fa; }
+        .navbar { background: linear-gradient(135deg, #ff7e5f 0%, #feb47b 100%); padding: 20px 40px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .navbar h1 { color: white; font-size: 24px; }
+        .navbar a { color: white; text-decoration: none; padding: 10px 20px; background: rgba(255,255,255,0.2); border-radius: 5px; transition: all 0.3s; margin-left: 10px; }
+        .navbar a:hover { background: rgba(255,255,255,0.3); }
+        .container { max-width: 800px; margin: 40px auto; padding: 0 20px; }
+        .form-container { background: white; padding: 40px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .form-group { margin-bottom: 20px; }
+        .form-group label { display: block; margin-bottom: 8px; font-weight: 600; color: #333; }
+        .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 5px; font-size: 14px; }
+        .form-group textarea { resize: vertical; min-height: 100px; }
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .btn { padding: 12px 24px; background: #ff7e5f; color: white; border: none; border-radius: 5px; cursor: pointer; text-decoration: none; display: inline-block; margin-right: 10px; }
+        .btn:hover { background: #e66a4f; }
+        .btn-secondary { background: #6c757d; }
+        .btn-secondary:hover { background: #5a6268; }
+        .error { color: #dc3545; font-size: 12px; margin-top: 5px; }
+        .required { color: #dc3545; }
+    </style>
+</head>
+<body>
+    <div class="navbar">
+        <h1>AssetFlow - Create Assignment</h1>
+        <div>
+            <a href="{% url 'manage_assignments' %}">Back to Assignments</a>
+            <a href="{% url 'admin_dashboard' %}">Dashboard</a>
+            <a href="{% url 'logout' %}">Logout</a>
+        </div>
+    </div>
+    
+    <div class="container">
+        <div class="form-container">
+            <h2 style="margin-bottom: 30px; color: #333;">Create New Assignment</h2>
+            
+            <form method="POST">
+                {% csrf_token %}
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="{{ form.asset.id_for_label }}">Asset <span class="required">*</span></label>
+                        {{ form.asset }}
+                        {% if form.asset.errors %}
+                            <div class="error">{{ form.asset.errors.0 }}</div>
+                        {% endif %}
+                        <p style="font-size: 12px; color: #666; margin-top: 5px;">Only available assets are shown</p>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="{{ form.employee.id_for_label }}">Employee <span class="required">*</span></label>
+                        {{ form.employee }}
+                        {% if form.employee.errors %}
+                            <div class="error">{{ form.employee.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="{{ form.expected_return_date.id_for_label }}">Expected Return Date</label>
+                    {{ form.expected_return_date }}
+                    {% if form.expected_return_date.errors %}
+                        <div class="error">{{ form.expected_return_date.errors.0 }}</div>
+                    {% endif %}
+                    <p style="font-size: 12px; color: #666; margin-top: 5px;">Optional - leave blank for permanent assignment</p>
+                </div>
+                
+                <div class="form-group">
+                    <label for="{{ form.remarks.id_for_label }}">Remarks</label>
+                    {{ form.remarks }}
+                    {% if form.remarks.errors %}
+                        <div class="error">{{ form.remarks.errors.0 }}</div>
+                    {% endif %}
+                    <p style="font-size: 12px; color: #666; margin-top: 5px;">Optional notes about this assignment</p>
+                </div>
+                
+                <div style="margin-top: 30px;">
+                    <button type="submit" class="btn">Create Assignment</button>
+                    <a href="{% url 'manage_assignments' %}" class="btn btn-secondary">Cancel</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</body>
+</html>

@@ -42,16 +42,55 @@
             <h2>Welcome, {{ user.get_full_name|default:user.username }}!</h2>
             <p>You are logged in as an <strong>Employee</strong>.</p>
         </div>
+        <!-- My Assets Section -->
+        {% if my_assignments %}
+        <div style="background: white; padding: 30px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); margin-bottom: 30px;">
+            <h3 style="color: #ff7e5f; margin-bottom: 20px;">My Current Assets ({{ total_assigned }})</h3>
+            <div style="display: grid; gap: 15px;">
+                {% for assignment in my_assignments %}
+                <div style="border: 1px solid #eee; padding: 20px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center;">
+                    <div>
+                        <h4 style="color: #333; margin-bottom: 5px;">{{ assignment.asset.name }}</h4>
+                        <p style="color: #666; font-size: 14px;">Serial: {{ assignment.asset.serial_number }} | Category: {{ assignment.asset.category.name }}</p>
+                        <p style="color: #666; font-size: 12px;">Assigned: {{ assignment.assigned_date|date:"M d, Y" }}</p>
+                    </div>
+                    <div style="text-align: right;">
+                        {% if assignment.expected_return_date %}
+                            <p style="font-size: 12px; color: #666;">Expected Return:</p>
+                            <p style="font-size: 14px; color: #ff7e5f;">{{ assignment.expected_return_date|date:"M d, Y" }}</p>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+        
         <div class="dashboard-grid">
             <div class="card">
                 <h3>📦 My Assets</h3>
-                <p>View assets assigned to you</p>
+                <p>You have {{ total_assigned }} asset{{ total_assigned|pluralize }} assigned</p>
             </div>
             <div class="card">
-                <h3>📝 Asset Requests</h3>
-                <p>Submit requests for new assets</p>
+                <h3>📝 Asset History</h3>
+                <p>View your asset assignment history</p>
             </div>
         </div>
+        
+        <!-- Assignment History -->
+        {% if assignment_history %}
+        <div style="background: white; padding: 30px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); margin-top: 30px;">
+            <h3 style="color: #ff7e5f; margin-bottom: 20px;">Recent Assignment History</h3>
+            <div style="display: grid; gap: 10px;">
+                {% for assignment in assignment_history %}
+                <div style="border-left: 3px solid #ff7e5f; padding: 15px; background: #f8f9fa; border-radius: 0 8px 8px 0;">
+                    <h4 style="color: #333; margin-bottom: 5px;">{{ assignment.asset.name }}</h4>
+                    <p style="color: #666; font-size: 14px;">{{ assignment.assigned_date|date:"M d, Y" }} - {{ assignment.returned_date|date:"M d, Y" }}</p>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
     </div>
 </body>
 </html>

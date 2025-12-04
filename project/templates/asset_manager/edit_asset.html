@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Asset - AssetFlow</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', sans-serif; background: #f8f9fa; }
+        .navbar { background: linear-gradient(135deg, #ff7e5f 0%, #feb47b 100%); padding: 20px 40px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .navbar h1 { color: white; font-size: 24px; }
+        .navbar a { color: white; text-decoration: none; padding: 10px 20px; background: rgba(255,255,255,0.2); border-radius: 5px; transition: all 0.3s; margin-left: 10px; }
+        .navbar a:hover { background: rgba(255,255,255,0.3); }
+        .container { max-width: 800px; margin: 40px auto; padding: 0 20px; }
+        .form-container { background: white; padding: 40px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .form-group { margin-bottom: 20px; }
+        .form-group label { display: block; margin-bottom: 8px; font-weight: 600; color: #333; }
+        .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 5px; font-size: 14px; }
+        .form-group textarea { resize: vertical; min-height: 100px; }
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .btn { padding: 12px 24px; background: #ff7e5f; color: white; border: none; border-radius: 5px; cursor: pointer; text-decoration: none; display: inline-block; margin-right: 10px; }
+        .btn:hover { background: #e66a4f; }
+        .btn-secondary { background: #6c757d; }
+        .btn-secondary:hover { background: #5a6268; }
+        .error { color: #dc3545; font-size: 12px; margin-top: 5px; }
+        .required { color: #dc3545; }
+        .current-image { max-width: 200px; margin-top: 10px; border-radius: 5px; }
+    </style>
+</head>
+<body>
+    <div class="navbar">
+        <h1>AssetFlow - Edit Asset</h1>
+        <div>
+            <a href="{% url 'asset_manager_assets' %}">Back to Assets</a>
+            <a href="{% url 'asset_manager_dashboard' %}">Dashboard</a>
+            <a href="{% url 'logout' %}">Logout</a>
+        </div>
+    </div>
+    
+    <div class="container">
+        <div class="form-container">
+            <h2 style="margin-bottom: 30px; color: #333;">Edit Asset: {{ asset.name }}</h2>
+            
+            <form method="POST" enctype="multipart/form-data">
+                {% csrf_token %}
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="{{ form.name.id_for_label }}">Asset Name <span class="required">*</span></label>
+                        {{ form.name }}
+                        {% if form.name.errors %}
+                            <div class="error">{{ form.name.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="{{ form.category.id_for_label }}">Category <span class="required">*</span></label>
+                        {{ form.category }}
+                        {% if form.category.errors %}
+                            <div class="error">{{ form.category.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="{{ form.brand.id_for_label }}">Brand</label>
+                        {{ form.brand }}
+                        {% if form.brand.errors %}
+                            <div class="error">{{ form.brand.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="{{ form.serial_number.id_for_label }}">Serial Number <span class="required">*</span></label>
+                        {{ form.serial_number }}
+                        {% if form.serial_number.errors %}
+                            <div class="error">{{ form.serial_number.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="{{ form.purchase_date.id_for_label }}">Purchase Date</label>
+                        {{ form.purchase_date }}
+                        {% if form.purchase_date.errors %}
+                            <div class="error">{{ form.purchase_date.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="{{ form.cost.id_for_label }}">Cost ($)</label>
+                        {{ form.cost }}
+                        {% if form.cost.errors %}
+                            <div class="error">{{ form.cost.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="{{ form.warranty_expiry.id_for_label }}">Warranty Expiry</label>
+                        {{ form.warranty_expiry }}
+                        {% if form.warranty_expiry.errors %}
+                            <div class="error">{{ form.warranty_expiry.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="{{ form.status.id_for_label }}">Status</label>
+                        {{ form.status }}
+                        {% if form.status.errors %}
+                            <div class="error">{{ form.status.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="{{ form.image.id_for_label }}">Asset Image</label>
+                    {{ form.image }}
+                    {% if asset.image %}
+                        <div style="margin-top: 10px;">
+                            <p style="font-size: 12px; color: #666;">Current image:</p>
+                            <img src="{{ asset.image.url }}" alt="{{ asset.name }}" class="current-image">
+                        </div>
+                    {% endif %}
+                    {% if form.image.errors %}
+                        <div class="error">{{ form.image.errors.0 }}</div>
+                    {% endif %}
+                </div>
+                
+                <div class="form-group">
+                    <label for="{{ form.description.id_for_label }}">Description</label>
+                    {{ form.description }}
+                    {% if form.description.errors %}
+                        <div class="error">{{ form.description.errors.0 }}</div>
+                    {% endif %}
+                </div>
+                
+                <div style="margin-top: 30px;">
+                    <button type="submit" class="btn">Update Asset</button>
+                    <a href="{% url 'asset_manager_assets' %}" class="btn btn-secondary">Cancel</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</body>
+</html>
