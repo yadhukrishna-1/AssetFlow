@@ -59,8 +59,8 @@
                 <p>Assigned Assets</p>
             </div>
             <div class="stat-card">
-                <h3>{{ repair_assets }}</h3>
-                <p>Under Repair</p>
+                <h3>{{ my_assignments }}</h3>
+                <p>My Assignments</p>
             </div>
         </div>
         
@@ -89,7 +89,17 @@
                     <p>Add new assets to the system</p>
                 </div>
             </a>
+            <a href="{% url 'manager_requests' %}" class="card-link">
+                <div class="card">
+                    <h3>📋 Asset Requests</h3>
+                    <p>{{ pending_requests }} pending request{{ pending_requests|pluralize }}</p>
+                </div>
+            </a>
         </div>
     </div>
+    
+    <footer style="text-align: center; padding: 20px; margin-top: 40px; border-top: 1px solid #eee; color: #666; font-size: 12px;">
+        © 2024 AssetFlow. All rights reserved.
+    </footer>
 </body>
 </html>

@@ -109,7 +109,23 @@
                     <p>Generate and view comprehensive asset reports</p>
                 </div>
             </a>
+            <a href="{% url 'admin_requests' %}" class="card-link">
+                <div class="card">
+                    <h3>📋 Final Approvals</h3>
+                    <p>{{ pending_admin_requests }} request{{ pending_admin_requests|pluralize }} awaiting final approval</p>
+                </div>
+            </a>
+            <a href="{% url 'reset_system' %}" class="card-link">
+                <div class="card" style="border: 2px solid #dc3545;">
+                    <h3 style="color: #dc3545;">🔄 System Reset</h3>
+                    <p style="color: #dc3545;">Reset all assignments and asset availability</p>
+                </div>
+            </a>
         </div>
     </div>
+    
+    <footer style="text-align: center; padding: 20px; margin-top: 40px; border-top: 1px solid #eee; color: #666; font-size: 12px;">
+        © 2024 AssetFlow. All rights reserved.
+    </footer>
 </body>
 </html>

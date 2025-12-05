@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'assets',
     'assignments',
     'reports',
+    'requests',
 ]
 # >>>>>>>>>>>
 AUTH_USER_MODEL = 'accounts.User'

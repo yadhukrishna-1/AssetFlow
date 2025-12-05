@@ -6,11 +6,9 @@ from django.conf import settings
 class Asset(models.Model):
     STATUS_AVAILABLE = 'available'
     STATUS_ASSIGNED = 'assigned'
-    STATUS_REPAIR = 'under_repair'
     STATUS_CHOICES = [
         (STATUS_AVAILABLE, 'Available'),
         (STATUS_ASSIGNED, 'Assigned'),
-        (STATUS_REPAIR, 'Under Repair'),
     ]
 
     name = models.CharField(max_length=200)

@@ -22,6 +22,9 @@ class Assignment(models.Model):
         self.asset.status = Asset.STATUS_AVAILABLE
         self.asset.save()
 
+
+# >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>save method has doubt>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> #
+
     def save(self, *args, **kwargs):
         # when creating an active assignment set asset status
         creating = self._state.adding

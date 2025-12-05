@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Review Request - Asset Manager</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .header { background: #f4f4f4; padding: 15px; margin-bottom: 20px; }
+        .btn { padding: 8px 16px; margin: 5px; text-decoration: none; border-radius: 4px; border: none; cursor: pointer; }
+        .btn-secondary { background: #6c757d; color: white; }
+        .btn-success { background: #28a745; color: white; }
+        .btn-danger { background: #dc3545; color: white; }
+        .info-box { background: #f8f9fa; padding: 15px; border-radius: 4px; margin-bottom: 20px; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; }
+        textarea { width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; height: 80px; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Review Asset Request</h1>
+        <a href="{% url 'manager_requests' %}" class="btn btn-secondary">← Back to Requests</a>
+    </div>
+
+    <div class="info-box">
+        <h3>Request Details</h3>
+        <p><strong>Employee:</strong> {{ asset_request.employee.get_full_name }}</p>
+        <p><strong>Type:</strong> {{ asset_request.get_request_type_display }}</p>
+        <p><strong>Asset/Category:</strong> 
+            {% if asset_request.asset %}
+                {{ asset_request.asset.name }}
+            {% elif asset_request.requested_asset %}
+                {{ asset_request.requested_asset.name }} ({{ asset_request.category.name }})
+                <br><small style="color: #666;">Serial: {{ asset_request.requested_asset.serial_number }}</small>
+            {% else %}
+                Any {{ asset_request.category.name }}
+            {% endif %}
+        </p>
+        <p><strong>Description:</strong> {{ asset_request.description }}</p>
+        <p><strong>Created:</strong> {{ asset_request.created_at }}</p>
+    </div>
+
+    <form method="post">
+        {% csrf_token %}
+        
+        {% if asset_request.request_type == 'new' and available_assets %}
+        <div class="form-group">
+            <label for="selected_asset">Select Asset to Assign:</label>
+            <select name="selected_asset" id="selected_asset" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;" required>
+                <option value="">Choose an asset...</option>
+                {% for asset in available_assets %}
+                <option value="{{ asset.id }}">{{ asset.name }} ({{ asset.serial_number }}){% if asset.brand %} - {{ asset.brand }}{% endif %}</option>
+                {% endfor %}
+            </select>
+            <small style="color: #666; font-size: 12px; display: block; margin-top: 5px;">Select the specific asset to assign to this employee</small>
+        </div>
+        {% endif %}
+        
+        <div class="form-group">
+            <label for="comments">Comments:</label>
+            <textarea name="comments" placeholder="Add your comments..."></textarea>
+        </div>
+        
+        {% if asset_request.request_type == 'new' and available_assets %}
+            <button type="submit" name="action" value="approve" class="btn btn-success">Approve & Assign Selected Asset</button>
+        {% else %}
+            <button type="submit" name="action" value="approve" class="btn btn-success">Approve & Send to Admin</button>
+        {% endif %}
+        <button type="submit" name="action" value="reject" class="btn btn-danger">Reject Request</button>
+    </form>
+</body>
+</html>

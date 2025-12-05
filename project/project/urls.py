@@ -1,19 +1,3 @@
-"""
-URL configuration for project project.
-
-The `urlpatterns` list routes URLs to views. For more information please see:
-    https://docs.djangoproject.com/en/5.2/topics/http/urls/
-Examples:
-Function views
-    1. Add an import:  from my_app import views
-    2. Add a URL to urlpatterns:  path('', views.home, name='home')
-Class-based views
-    1. Add an import:  from other_app.views import Home
-    2. Add a URL to urlpatterns:  path('', Home.as_view(), name='home')
-Including another URLconf
-    1. Import the include() function: from django.urls import include, path
-    2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
-"""
 # corporate_asset_mgmt/urls.py
 from django.contrib import admin
 from django.urls import path, include
@@ -67,6 +51,7 @@ urlpatterns = [
     path('admin-panel/assignments/', accounts_views.manage_assignments, name='manage_assignments'),
     path('admin-panel/assignments/create/', accounts_views.create_assignment, name='create_assignment'),
     path('admin-panel/assignments/<int:assignment_id>/return/', accounts_views.return_asset, name='return_asset'),
+    path('admin-panel/reset-system/', accounts_views.reset_system, name='reset_system'),
     
     # Asset Manager URLs
     path('asset-manager/assets/', accounts_views.asset_manager_assets, name='asset_manager_assets'),
@@ -82,6 +67,9 @@ urlpatterns = [
     path('reports/assignments/', reports_views.assignment_report, name='assignment_report'),
     path('reports/export/assets/', reports_views.export_assets_csv, name='export_assets_csv'),
     path('reports/export/assignments/', reports_views.export_assignments_csv, name='export_assignments_csv'),
+    
+    # Request URLs
+    path('requests/', include('requests.urls')),
 ]
 
 if settings.DEBUG:

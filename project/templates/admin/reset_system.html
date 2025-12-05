@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>System Reset - Admin</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .header { background: #f4f4f4; padding: 15px; margin-bottom: 20px; }
+        .btn { padding: 8px 16px; margin: 5px; text-decoration: none; border-radius: 4px; border: none; cursor: pointer; }
+        .btn-secondary { background: #6c757d; color: white; }
+        .btn-danger { background: #dc3545; color: white; font-weight: bold; }
+        .warning-box { background: #fff3cd; border: 1px solid #ffeaa7; padding: 20px; border-radius: 8px; margin: 20px 0; }
+        .stats-box { background: #f8f9fa; padding: 15px; border-radius: 8px; margin: 20px 0; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; }
+        input[type="text"] { width: 200px; padding: 8px; border: 1px solid #ddd; border-radius: 4px; }
+        .danger-text { color: #dc3545; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>System Reset</h1>
+        <a href="{% url 'admin_dashboard' %}" class="btn btn-secondary">← Back to Dashboard</a>
+    </div>
+
+    {% if messages %}
+        {% for message in messages %}
+            <div style="padding: 10px; margin: 10px 0; background: {% if message.tags == 'error' %}#f8d7da{% else %}#d4edda{% endif %}; border: 1px solid {% if message.tags == 'error' %}#f5c6cb{% else %}#c3e6cb{% endif %}; border-radius: 4px;">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <div class="warning-box">
+        <h3 class="danger-text">⚠️ WARNING: SYSTEM RESET</h3>
+        <p>This operation will perform a complete system reset for maintenance purposes:</p>
+        <ul>
+            <li><strong>All active assignments will be returned</strong></li>
+            <li><strong>All assets will be set to "Available" status</strong></li>
+            <li><strong>All request history will be cleared</strong></li>
+        </ul>
+        <p class="danger-text">This action cannot be undone!</p>
+    </div>
+
+    <div class="stats-box">
+        <h3>Current System Status</h3>
+        <p><strong>Active Assignments:</strong> {{ active_assignments }}</p>
+        <p><strong>Total Requests:</strong> {{ pending_requests }}</p>
+    </div>
+
+    <form method="post">
+        {% csrf_token %}
+        <div class="form-group">
+            <label for="confirm">Type "RESET" to confirm system reset:</label>
+            <input type="text" name="confirm" id="confirm" placeholder="Type RESET here" required>
+        </div>
+        <button type="submit" class="btn btn-danger" onclick="return confirm('Are you absolutely sure you want to reset the entire system? This will clear all assignments and requests!')">
+            🔄 RESET SYSTEM
+        </button>
+    </form>
+
+    <div style="margin-top: 30px; padding: 15px; background: #e9ecef; border-radius: 8px;">
+        <h4>Alternative: Command Line Reset</h4>
+        <p>You can also reset the system using the management command:</p>
+        <code>python manage.py reset_system --confirm</code>
+    </div>
+</body>
+</html>

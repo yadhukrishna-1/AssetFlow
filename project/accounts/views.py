@@ -56,6 +56,10 @@ def admin_dashboard(request):
     manager_count = User.objects.filter(role='asset_manager').count()
     employee_count = User.objects.filter(role='employee').count()
     
+    from requests.models import AssetRequest
+    pending_manager_requests = AssetRequest.objects.filter(status='pending').count()
+    pending_admin_requests = AssetRequest.objects.filter(status='manager_approved').count()
+    
     context = {
         'total_assets': total_assets,
         'available_assets': available_assets,
@@ -65,6 +69,8 @@ def admin_dashboard(request):
         'admin_count': admin_count,
         'manager_count': manager_count,
         'employee_count': employee_count,
+        'pending_manager_requests': pending_manager_requests,
+        'pending_admin_requests': pending_admin_requests,
     }
     return render(request, 'admin_dashboard.html', context)
 
@@ -79,29 +85,39 @@ def asset_manager_dashboard(request):
     total_assets = Asset.objects.count()
     available_assets = Asset.objects.filter(status='available').count()
     assigned_assets = Asset.objects.filter(status='assigned').count()
-    repair_assets = Asset.objects.filter(status='under_repair').count()
     my_assignments = Assignment.objects.filter(assigned_by=request.user, active=True).count()
+    
+    from requests.models import AssetRequest
+    pending_requests = AssetRequest.objects.filter(status='pending').count()
     
     context = {
         'total_assets': total_assets,
         'available_assets': available_assets,
         'assigned_assets': assigned_assets,
-        'repair_assets': repair_assets,
         'my_assignments': my_assignments,
+        'pending_requests': pending_requests,
     }
     return render(request, 'asset_manager_dashboard.html', context)
 
 @login_required(login_url='login')
 def employee_dashboard(request):
     """Employee dashboard - for regular employees"""
+    from requests.models import AssetRequest
+    
     # Get employee's assignments
     my_assignments = Assignment.objects.filter(employee=request.user, active=True)
     assignment_history = Assignment.objects.filter(employee=request.user, active=False)[:5]
+    
+    # Get recent requests
+    recent_requests = AssetRequest.objects.filter(employee=request.user).order_by('-created_at')[:5]
+    pending_requests = AssetRequest.objects.filter(employee=request.user, status='pending').count()
     
     context = {
         'my_assignments': my_assignments,
         'assignment_history': assignment_history,
         'total_assigned': my_assignments.count(),
+        'recent_requests': recent_requests,
+        'pending_requests': pending_requests,
     }
     return render(request, 'employee_dashboard.html', context)
 
@@ -559,3 +575,49 @@ def delete_user(request, user_id):
         return redirect('manage_users')
     
     return render(request, 'admin/delete_user.html', {'user_obj': user})
+
+@login_required(login_url='login')
+def reset_system(request):
+    """Admin system reset - clear all assignments and reset asset availability"""
+    if not request.user.is_admin():
+        messages.error(request, 'Access denied.')
+        return redirect('home')
+    
+    from requests.models import AssetRequest
+    
+    if request.method == 'POST':
+        confirm = request.POST.get('confirm')
+        if confirm == 'RESET':
+            from django.db import transaction
+            
+            with transaction.atomic():
+                # Mark all assignments as returned
+                active_assignments = Assignment.objects.filter(active=True)
+                assignment_count = active_assignments.count()
+                
+                for assignment in active_assignments:
+                    assignment.mark_returned()
+                
+                # Reset all assets to available
+                Asset.objects.all().update(status=Asset.STATUS_AVAILABLE)
+                asset_count = Asset.objects.count()
+                
+                # Clear ALL request history
+                all_requests = AssetRequest.objects.all()
+                request_count = all_requests.count()
+                all_requests.delete()
+            
+            messages.success(request, f'System reset completed: {assignment_count} assignments returned, {asset_count} assets available, {request_count} pending requests cleared.')
+            return redirect('admin_dashboard')
+        else:
+            messages.error(request, 'Reset confirmation failed. Type "RESET" to confirm.')
+    
+    # Get current system stats
+    active_assignments = Assignment.objects.filter(active=True).count()
+    pending_requests = AssetRequest.objects.count()
+    
+    context = {
+        'active_assignments': active_assignments,
+        'pending_requests': pending_requests,
+    }
+    return render(request, 'admin/reset_system.html', context)
